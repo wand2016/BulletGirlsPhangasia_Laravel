@@ -23,6 +23,11 @@ services:
       - 9001:9001 # for storybook
     environment:
       - REGISTRY_PORT=${REGISTRY_PORT}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - DEFAULT_REGION_NAME=${DEFAULT_REGION_NAME}
+      - DEFAULT_OUTPUT_FORMAT=${DEFAULT_OUTPUT_FORMAT}
+      - AWS_ECR_HOST=${AWS_ECR_HOST}
     volumes:
       - ./:/root
 

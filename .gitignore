@@ -1,3 +1,4 @@
 .env
 www_clean
 .ash_history
+.docker

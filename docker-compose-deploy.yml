@@ -1,70 +1,30 @@
 version: '3'
 volumes:
-  database:
   nginx_log:
   app_storage:
 services:
-  # build php and js
-  builder:
-    build:
-      context: .
-      dockerfile: ./builder/Dockerfile
-      args:
-        - APP_CODE_PATH_HOST=${APP_CODE_PATH_HOST}
-        - APP_CODE_PATH_CONTAINER=${APP_CODE_PATH_CONTAINER}
-    image: ${BUILDER_CONAINER_IMAGE_NAME}
   nginx:
     build:
       context: .
-      dockerfile: ./nginx/Dockerfile
+      dockerfile: ./nginx_deploy/Dockerfile
       args:
-        - PHP_UPSTREAM_CONTAINER=${NGINX_PHP_UPSTREAM_CONTAINER}
-        - PHP_UPSTREAM_PORT=${NGINX_PHP_UPSTREAM_PORT}
-        - APP_CODE_PATH_HOST=${APP_CODE_PATH_HOST}
         - APP_CODE_PATH_CONTAINER=${APP_CODE_PATH_CONTAINER}
-        - BUILDER_CONAINER_IMAGE_NAME=${BUILDER_CONAINER_IMAGE_NAME}
-    image: hoge-project/nginx
+        - REGISTRY_PORT=${REGISTRY_PORT}
+    image: registry:${REGISTRY_PORT}/deploy/nginx
     ports:
       - ${NGINX_HOST_HTTP_PORT}:${NGINX_HOST_HTTP_PORT}
-    # use intermediate building container
     depends_on:
-      - builder
-    links:
       - php-fpm
     volumes:
       - nginx_log:/var/log/nginx
   php-fpm:
     build:
       context: .
-      dockerfile: ./php-fpm/Dockerfile
+      dockerfile: ./php-fpm_deploy/Dockerfile
       args:
-        - PHP_VERSION=${PHP_VERSION}
         - APP_CODE_PATH_HOST=${APP_CODE_PATH_HOST}
         - APP_CODE_PATH_CONTAINER=${APP_CODE_PATH_CONTAINER}
-        - BUILDER_CONAINER_IMAGE_NAME=${BUILDER_CONAINER_IMAGE_NAME}        
-    image: hoge-project/php-fpm
-    command: /var/www/init.sh
+        - REGISTRY_PORT=${REGISTRY_PORT}        
+    image: registry:${REGISTRY_PORT}/deploy/php-fpm
     volumes:
         - app_storage:/var/www/storage/
-    # use intermediate building container        
-    depends_on:
-      - builder
-    links:
-      - mysql
-  mysql:
-    build:
-      context: .
-      dockerfile: ./mysql/Dockerfile
-      args:
-        - MYSQL_VERSION=${MYSQL_VERSION}
-    image: hoge-project/mysql
-    environment:
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - TZ=${WORKSPACE_TIMEZONE}
-    volumes:
-      - database:/var/lib/mysql
-    ports:
-      - "${MYSQL_PORT}:3306"

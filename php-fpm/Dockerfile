@@ -12,3 +12,6 @@ COPY ./php-fpm/php7.2.ini /usr/local/etc/php/php.ini
 
 # これをしないとstorage/logsの書き込みでpermission errorになる
 USER www-data
+
+ARG APP_CODE_PATH_CONTAINER=${APP_CODE_PATH_CONTAINER}
+WORKDIR ${APP_CODE_PATH_CONTAINER}
