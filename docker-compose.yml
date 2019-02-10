@@ -1,0 +1,46 @@
+# for development
+version: '3'
+volumes:
+  database_dev:
+services:
+  nginx:
+    image: registry:${REGISTRY_PORT}/base/nginx
+    ports:
+      - ${NGINX_HOST_HTTP_PORT}:${NGINX_HOST_HTTP_PORT}
+    depends_on:
+      - php-fpm
+    volumes:
+      - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
+  php-fpm:
+    image: registry:${REGISTRY_PORT}/base/php-fpm
+    volumes:
+      - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
+    links:
+      - mysql
+  mysql:
+    image: registry:${REGISTRY_PORT}/base/mysql
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - TZ=${WORKSPACE_TIMEZONE}
+    volumes:
+      - database_dev:/var/lib/mysql
+    expose:
+      - "3306"
+  # workspaces
+  node_workspace:
+    image: registry:${REGISTRY_PORT}/base/node
+    volumes:
+      - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
+    tty: true
+    ports:
+      - 8080:8080  # for HMR
+      - 9001:9001  # for Storybook
+  composer_workspace:
+    image: registry:${REGISTRY_PORT}/base/composer
+    volumes:
+      - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
+    tty: true
+    command: "bash"

@@ -1,0 +1,42 @@
+version: '3'
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: ./nginx/Dockerfile
+      args:
+        - PHP_UPSTREAM_CONTAINER=${NGINX_PHP_UPSTREAM_CONTAINER}
+        - PHP_UPSTREAM_PORT=${NGINX_PHP_UPSTREAM_PORT}
+        - APP_CODE_PATH_CONTAINER=${APP_CODE_PATH_CONTAINER}
+    image: registry:${REGISTRY_PORT}/base/nginx
+  php-fpm:
+    build:
+      context: .
+      dockerfile: ./php-fpm/Dockerfile
+      args:
+        - PHP_VERSION=${PHP_VERSION}
+        - APP_CODE_PATH_CONTAINER=${APP_CODE_PATH_CONTAINER}
+    image: registry:${REGISTRY_PORT}/base/php-fpm
+  # for local testing
+  mysql:
+    build:
+      context: .
+      dockerfile: ./mysql/Dockerfile
+      args:
+        - MYSQL_VERSION=${MYSQL_VERSION}
+    image: registry:${REGISTRY_PORT}/base/mysql
+  # for workspace
+  node:
+    build:
+      context: .
+      dockerfile: ./node/Dockerfile
+      args:
+        - APP_CODE_PATH_CONTAINER=${APP_CODE_PATH_CONTAINER}
+    image: registry:${REGISTRY_PORT}/base/node
+  composer:
+    build:
+      context: .
+      dockerfile: ./composer/Dockerfile
+      args:
+        - APP_CODE_PATH_CONTAINER=${APP_CODE_PATH_CONTAINER}
+    image: registry:${REGISTRY_PORT}/base/composer
