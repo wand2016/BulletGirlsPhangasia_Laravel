@@ -4,7 +4,7 @@
 1. .envにAWSのIAMの認証情報を記入
 1. AWS ECRのpush先ホストも記入
 1. `docker-compose -f setup.yml up -d`
-1. `docker-compose -f setup.yml exec sh`
+1. `docker-compose -f setup.yml exec dind sh`
     - alpineベースのためbashがない
 1. 以降すべてdindコンテナの中で作業する
 1. `cd /root`
