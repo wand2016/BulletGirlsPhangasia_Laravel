@@ -17,7 +17,6 @@ jobs:
       # - image: circleci/mysql:5.7-ram
       #
       # - image: redis:2.8.19
-      - working_directory: ./www
     steps:
       - checkout
 
@@ -32,7 +31,11 @@ jobs:
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
 
-      - run: composer install -n --prefer-dist
+      - run:
+          name: install php packages
+          command: composer install -n --prefer-dist
+          working_directory: ./www
+
 
       - save_cache:
           key: v1-dependencies-{{ checksum "composer.json" }}
@@ -41,4 +44,7 @@ jobs:
 
       # run tests with phpunit or codecept
       #- run: ./vendor/bin/phpunit
-      - run: ./vendor/bin/phpunit
+      - run:
+          name: php testing
+          command: ./vendor/bin/phpunit
+          working_directory: ./www
