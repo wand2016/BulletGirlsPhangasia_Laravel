@@ -43,5 +43,9 @@ jobs:
 
       - run:
           name: php testing
-          command: ./vendor/bin/phpunit --coverage-html=$CIRCLE_ARTIFACTS
+          command: ./vendor/bin/phpunit --coverage-html=/tmp/coverage
           working_directory: ./www
+
+      - store_artifacts:
+          path: /tmp/coverage
+          destination: coverage
