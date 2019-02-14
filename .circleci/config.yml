@@ -27,11 +27,9 @@ jobs:
       - restore_cache:
           keys:
             # "composer.lock" can be used if it is committed to the repo
-            - v1-dependencies-{{ checksum "composer.json" }}
+            - v1-dependencies-{{ checksum "www/composer.json" }}
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
-          working_directory: ./www            
-
       - run:
           name: install php packages
           command: composer install -n --prefer-dist
@@ -39,10 +37,9 @@ jobs:
 
 
       - save_cache:
-          key: v1-dependencies-{{ checksum "composer.json" }}
+          key: v1-dependencies-{{ checksum "www/composer.json" }}
           paths:
             - ./vendor
-          working_directory: ./www            
 
       # run tests with phpunit or codecept
       #- run: ./vendor/bin/phpunit
