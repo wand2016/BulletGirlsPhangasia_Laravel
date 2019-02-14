@@ -62,3 +62,13 @@ jobs:
           command: ./vendor/bin/phpunit
           working_directory: ./www
       
+
+
+workflows:
+  version: 2
+  setup_and_deploy:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
