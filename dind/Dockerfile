@@ -1,4 +1,4 @@
-FROM docker:stable-dind
+FROM docker
 
 RUN apk update
 RUN apk upgrade

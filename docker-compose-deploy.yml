@@ -1,30 +1,20 @@
 version: '3'
 volumes:
-  nginx_log:
-  app_storage:
+  code_share:
 services:
   nginx:
-    build:
-      context: .
-      dockerfile: ./nginx_deploy/Dockerfile
-      args:
-        - APP_CODE_PATH_CONTAINER=${APP_CODE_PATH_CONTAINER}
-        - REGISTRY_PORT=${REGISTRY_PORT}
-    image: registry:${REGISTRY_PORT}/deploy/nginx
+    image: ${COMPOSE_PROJECT_NAME}_nginx
     ports:
       - ${NGINX_HOST_HTTP_PORT}:${NGINX_HOST_HTTP_PORT}
     depends_on:
       - php-fpm
-    volumes:
-      - nginx_log:/var/log/nginx
   php-fpm:
     build:
       context: .
       dockerfile: ./php-fpm_deploy/Dockerfile
       args:
+        - COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME}
         - APP_CODE_PATH_HOST=${APP_CODE_PATH_HOST}
         - APP_CODE_PATH_CONTAINER=${APP_CODE_PATH_CONTAINER}
-        - REGISTRY_PORT=${REGISTRY_PORT}        
-    image: registry:${REGISTRY_PORT}/deploy/php-fpm
     volumes:
-        - app_storage:/var/www/storage/
+        - code_share:/var/www/

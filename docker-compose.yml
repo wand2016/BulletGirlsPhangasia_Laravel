@@ -1,10 +1,14 @@
 # for development
 version: '3'
-volumes:
-  database_dev:
 services:
   nginx:
-    image: registry:${REGISTRY_PORT}/base/nginx
+    build:
+      context: .
+      dockerfile: ./nginx/Dockerfile
+      args:
+        - PHP_UPSTREAM_CONTAINER=${NGINX_PHP_UPSTREAM_CONTAINER}
+        - PHP_UPSTREAM_PORT=${NGINX_PHP_UPSTREAM_PORT}
+        - APP_CODE_PATH_CONTAINER=${APP_CODE_PATH_CONTAINER}
     ports:
       - ${NGINX_HOST_HTTP_PORT}:${NGINX_HOST_HTTP_PORT}
     links:
@@ -12,26 +16,21 @@ services:
     volumes:
       - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
   php-fpm:
-    image: registry:${REGISTRY_PORT}/base/php-fpm
+    build:
+      context: .
+      dockerfile: ./php-fpm/Dockerfile
+      args:
+        - PHP_VERSION=${PHP_VERSION}
+        - APP_CODE_PATH_CONTAINER=${APP_CODE_PATH_CONTAINER}
     volumes:
       - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
-    links:
-      - mysql
-  mysql:
-    image: registry:${REGISTRY_PORT}/base/mysql
-    environment:
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - TZ=${WORKSPACE_TIMEZONE}
-    volumes:
-      - database_dev:/var/lib/mysql
-    expose:
-      - "3306"
   # workspaces
   node_workspace:
-    image: registry:${REGISTRY_PORT}/base/node
+    build:
+      context: .
+      dockerfile: ./node/Dockerfile
+      args:
+        - APP_CODE_PATH_CONTAINER=${APP_CODE_PATH_CONTAINER}
     volumes:
       - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
     tty: true
@@ -39,7 +38,11 @@ services:
       - 8080:8080  # for HMR
       - 9001:9001  # for Storybook
   composer_workspace:
-    image: registry:${REGISTRY_PORT}/base/composer
+    build:
+      context: .
+      dockerfile: ./composer/Dockerfile
+      args:
+        - APP_CODE_PATH_CONTAINER=${APP_CODE_PATH_CONTAINER}
     volumes:
       - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
     tty: true

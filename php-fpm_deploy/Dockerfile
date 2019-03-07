@@ -1,26 +1,25 @@
-ARG REGISTRY_PORT=${REGISTRY_PORT}
-
 # ----------------------------------------
 # multi-stage build
 # ----------------------------------------
 
-FROM registry:${REGISTRY_PORT}/base/composer as built-php
+ARG COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME}
+
+FROM ${COMPOSE_PROJECT_NAME}_composer as built-php
 
 # コードのコピー
 ARG APP_CODE_PATH_HOST=${APP_CODE_PATH_HOST}
 ARG APP_CODE_PATH_CONTAINER=${APP_CODE_PATH_CONTAINER}
 COPY --chown=www-data:www-data ${APP_CODE_PATH_HOST} ${APP_CODE_PATH_CONTAINER}
 
-
 RUN composer install
 
-FROM registry:${REGISTRY_PORT}/base/node as built-php-and-js
+FROM ${COMPOSE_PROJECT_NAME}_node as built-php-and-js
 
 # コードのコピー
 ARG APP_CODE_PATH_CONTAINER=${APP_CODE_PATH_CONTAINER}
 COPY --from=built-php --chown=www-data:www-data ${APP_CODE_PATH_CONTAINER} ${APP_CODE_PATH_CONTAINER}
 
-
+# パッケージ取得・ビルド
 RUN yarn
 RUN yarn prod
 
@@ -28,7 +27,7 @@ RUN yarn prod
 # ----------------------------------------
 # ベースイメージ
 # ----------------------------------------
-FROM registry:${REGISTRY_PORT}/base/php-fpm
+FROM ${COMPOSE_PROJECT_NAME}_php-fpm
 
 # コードのコピー
 ARG APP_CODE_PATH_CONTAINER=${APP_CODE_PATH_CONTAINER}
