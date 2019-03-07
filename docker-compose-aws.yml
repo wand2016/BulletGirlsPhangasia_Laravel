@@ -1,0 +1,15 @@
+version: '3'
+services:
+  dood:
+    image: docker
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - ./deploy:/root
+    environment:
+      - COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - DEFAULT_REGION_NAME=${DEFAULT_REGION_NAME}
+      - DEFAULT_OUTPUT_FORMAT=${DEFAULT_OUTPUT_FORMAT}
+      - AWS_ECR_HOST=${AWS_ECR_HOST}
+    tty: true

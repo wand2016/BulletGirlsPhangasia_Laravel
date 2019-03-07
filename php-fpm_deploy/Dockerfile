@@ -4,7 +4,7 @@
 
 ARG COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME}
 
-FROM ${COMPOSE_PROJECT_NAME}_composer as built-php
+FROM ${COMPOSE_PROJECT_NAME}_composer_workspace as built-php
 
 # コードのコピー
 ARG APP_CODE_PATH_HOST=${APP_CODE_PATH_HOST}
@@ -13,7 +13,7 @@ COPY --chown=www-data:www-data ${APP_CODE_PATH_HOST} ${APP_CODE_PATH_CONTAINER}
 
 RUN composer install
 
-FROM ${COMPOSE_PROJECT_NAME}_node as built-php-and-js
+FROM ${COMPOSE_PROJECT_NAME}_node_workspace as built-php-and-js
 
 # コードのコピー
 ARG APP_CODE_PATH_CONTAINER=${APP_CODE_PATH_CONTAINER}
